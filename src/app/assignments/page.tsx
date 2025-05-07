@@ -1,7 +1,7 @@
 import Modal from "../components/Modal";
 
 
-export default function(){
+export default function Tasks (){
     return(
         <Modal />
     )
