@@ -173,3 +173,33 @@ export const HighlightSection = styled.div`
     margin-top: 0;
   }
 `;
+
+export const LoadingSpinner = styled.div`
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid white;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+export const AlertMessage = styled.div<{ type: "success" | "error" }>`
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  color: white;
+  background-color: ${({ type }) => (type === "success" ? "#4CAF50" : "#F44336")};
+  text-align: center;
+`;
