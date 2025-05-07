@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   compiler: {
     styledComponents: true,
-    // Adiciona suporte para suppress hydration warnings se necessário
     reactRemoveProperties: process.env.NODE_ENV === 'production',
   },
   webpack: (config, { isServer }) => {
