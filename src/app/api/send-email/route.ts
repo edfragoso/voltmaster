@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       html: `
         <p>Olá, <strong>${name}</strong>, tudo bem?</p>
         <p>Espero realmente que sim.</p>
-        <p>Passando pra avisar que recebi sua mensagem sobre <strong>${service || 'seu interesse em nossos serviços'}</strong>, muito me alegra o teu contato.</p>
+        <p>Passando pra avisar que recebi sua mensagem sobre <strong>${service || 'seu interesse em nossos serviços'}</strong>, fico feliz por contato.</p>
         <p>Prometo responder o mais breve possível.</p>
         <br>
         <p>Atenciosamente,</p>
