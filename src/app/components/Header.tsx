@@ -61,7 +61,7 @@ export default function Header() {
               </StyledLink>
             </li>
             <li>
-              <StyledLink href="#about" onClick={closeMenu}>
+              <StyledLink href="/about" onClick={closeMenu}>
                 Sobre
               </StyledLink>
             </li>
