@@ -1,8 +1,6 @@
 // app/contact/page.tsx
 "use client";
-
-import Footer from "../components/Footer";
-import Header from "../components/Header";
+import { useState } from "react";
 import {
   ContactContainer,
   ContactTitle,
@@ -17,13 +15,114 @@ import {
   SubmitButton,
   MapContainer,
   HighlightSection,
+  LoadingSpinner,
+  AlertMessage,
 } from "./ContactForm.styles";
 
 export default function ContactPage() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    service: "",
+    message: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
+  const validateForm = () => {
+    // Validação básica de campos obrigatórios
+    if (!formData.name || !formData.email || !formData.message) {
+      setStatus({
+        type: "error",
+        message: "Por favor, preencha todos os campos obrigatórios.",
+      });
+      return false;
+    }
+
+    // Validação de e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setStatus({
+        type: "error",
+        message: "Por favor, insira um endereço de e-mail válido.",
+      });
+      return false;
+    }
+
+    // Validação de telefone (opcional, mas recomendado)
+    if (formData.phone) {
+      const phoneRegex = /^\(?\d{2}\)?[\s-]?\d{4,5}[\s-]?\d{4}$/;
+      if (!phoneRegex.test(formData.phone)) {
+        setStatus({
+          type: "error",
+          message: "Por favor, insira um número de telefone válido.",
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Validação e envio do formulário
-    alert("Mensagem enviada com sucesso! Entraremos em contato em breve.");
+    
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+    setStatus({ type: null, message: "" });
+
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || data.error || "Falha no envio da mensagem");
+      }
+
+      setStatus({
+        type: "success",
+        message: data.message || "Mensagem enviada com sucesso! Entraremos em contato em breve.",
+      });
+      
+      // Reset form only on success
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        service: "",
+        message: "",
+      });
+      
+    } catch (error: any) {
+      console.error("Erro no envio:", error);
+      setStatus({
+        type: "error",
+        message: error.message || "Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente mais tarde.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,6 +133,10 @@ export default function ContactPage() {
           Preencha o formulário abaixo ou utilize um dos nossos canais diretos
           para solicitar um orçamento ou tirar dúvidas.
         </ContactIntro>
+
+        {status.type && (
+          <AlertMessage type={status.type}>{status.message}</AlertMessage>
+        )}
 
         <ContactGrid>
           <ContactInfoCard>
@@ -71,7 +174,7 @@ export default function ContactPage() {
               </ContactIcon>
               <div>
                 <h3>E-mail</h3>
-                <p>contato@voltmaster.com.br</p>
+                <p>ednilson.fragoso@hotmail.com.br</p>
                 <small>Respondemos em até 24h</small>
               </div>
             </ContactMethod>
@@ -98,6 +201,8 @@ export default function ContactPage() {
                   id="name"
                   required
                   placeholder="Seu nome completo"
+                  value={formData.name}
+                  onChange={handleChange}
                 />
               </FormGroup>
 
@@ -108,6 +213,8 @@ export default function ContactPage() {
                   id="email"
                   required
                   placeholder="seu@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
                 />
               </FormGroup>
 
@@ -118,12 +225,20 @@ export default function ContactPage() {
                   id="phone"
                   required
                   placeholder="(51) 99999-9999"
+                  value={formData.phone}
+                  onChange={handleChange}
                 />
               </FormGroup>
 
               <FormGroup>
                 <label htmlFor="service">Serviço de Interesse</label>
-                <FormControl as="select" id="service" required>
+                <FormControl
+                  as="select"
+                  id="service"
+                  required
+                  value={formData.service}
+                  onChange={handleChange}
+                >
                   <option value="">Selecione...</option>
                   <option value="instalacao">Instalação Elétrica</option>
                   <option value="manutencao">Manutenção Preventiva</option>
@@ -141,10 +256,20 @@ export default function ContactPage() {
                   required
                   rows={5}
                   placeholder="Descreva sua necessidade..."
+                  value={formData.message}
+                  onChange={handleChange}
                 />
               </FormGroup>
 
-              <SubmitButton type="submit">ENVIAR MENSAGEM</SubmitButton>
+              <SubmitButton type="submit" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <LoadingSpinner /> ENVIANDO...
+                  </>
+                ) : (
+                  "ENVIAR MENSAGEM"
+                )}
+              </SubmitButton>
             </form>
           </ContactFormCard>
         </ContactGrid>
@@ -168,8 +293,6 @@ export default function ContactPage() {
           </p>
         </HighlightSection>
       </ContactContainer>
-
-      
     </>
   );
 }
