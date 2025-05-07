@@ -56,7 +56,7 @@ export default function Header() {
               </StyledLink>
             </li>
             <li>
-              <StyledLink href="#services" onClick={closeMenu}>
+              <StyledLink href="/assignments" onClick={closeMenu}>
                 Serviços
               </StyledLink>
             </li>
