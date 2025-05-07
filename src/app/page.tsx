@@ -10,7 +10,6 @@ import MissionVision from "./components/MissionVision";
 export default function Home() {
   return (
     <>
-      
       <main className="container">
         <HighlightSection />
 
@@ -42,8 +41,6 @@ export default function Home() {
 
         <CTA />
       </main>
-
-      <Footer />
     </>
   );
 }
